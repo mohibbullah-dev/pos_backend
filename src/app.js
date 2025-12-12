@@ -14,6 +14,12 @@ app.get("/", (req, res) => {
   res.status(200).json({ message: "hello world" });
 });
 
+// route start from here
+
+import userRoute from "./route/user.router.js";
+
+app.use("/api/v1/users", userRoute);
+
 app.use(errorHandler);
 
 export { app };
