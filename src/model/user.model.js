@@ -2,16 +2,26 @@ import { Schema, mongoose } from "./mongoose";
 const userSchema = new Schema(
   {
     name: {
-      type: "String",
+      type: String,
       required: [true, "name is required"],
     },
     email: {
-      type: "String",
+      type: String,
       required: [true, "email is required"],
       validate: (v) => {
         return /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(v);
       },
       message: "Please enter valid email",
+    },
+    avatar: {
+      url: {
+        type: String,
+        required: [true, "avater url is required"],
+      },
+      public_id: {
+        type: String,
+        required: [true, "public_id is required"],
+      },
     },
     phone: {
       type: Number,
