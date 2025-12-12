@@ -1,2 +1,38 @@
+import { Schema, mongoose } from "./mongoose";
+const userSchema = new Schema(
+  {
+    name: {
+      type: "String",
+      required: [true, "name is required"],
+    },
+    email: {
+      type: "String",
+      required: [true, "email is required"],
+      validate: (v) => {
+        return /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(v);
+      },
+      message: "Please enter valid email",
+    },
+    phone: {
+      type: Number,
+      required: [true, "Phone is required"],
+      validate: {
+        validator: (v) => {
+          return /\+?[1-9]\d{6,14}$/.test(v);
+        },
+        message: "Please enter a valid phone number",
+      },
+    },
+    password: {
+      type: String,
+      required: [true, "password is required"],
+    },
+    rule: {
+      type: String,
+      required: true,
+    },
+  },
+  { timestamps: true }
+);
 
-
+export const User = mongoose.model("User", userSchema);
