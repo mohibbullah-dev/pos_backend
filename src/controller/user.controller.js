@@ -4,10 +4,16 @@ import asyncHandler from "../utils/asyncHandler.js";
 import { cloudinaryImageUpload } from "../utils/cloudinary.js";
 
 const signUp = asyncHandler(async (req, res) => {
-  const { name, email, password, role } = req.body;
-  const localPath = req.file;
+  const { name, email, password, role, phone } = req.body;
+  const localPath = req.file.path;
+  console.log("name :", name);
+  console.log("email :", email);
+  console.log("password :", password);
+  console.log("role :", role);
+  console.log("phone :", phone);
+  console.log("localPath :", localPath);
 
-  if (!name || !email || !password || !role || !localPath)
+  if (!name || !email || !password || !role || !phone || !localPath)
     throw new apiError(400, "all fields are required");
 
   const exist = await User.findOne({ email });
@@ -24,6 +30,8 @@ const signUp = asyncHandler(async (req, res) => {
     ],
     public_id: Date.now(),
   });
+
+  console.log("cloudinaryRes :", cloudinaryRes);
 
   if (cloudinaryRes.secure_url && cloudinaryRes.public_id) {
     const createUser = await User.create({
