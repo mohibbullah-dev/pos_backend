@@ -6,7 +6,7 @@ dotenv.config({ path: "./env" });
 
 MONGODB_CONNECTION()
   .then(() => {
-    app.listen(PORT, () => {
+    app.listen(PORT || 8000, () => {
       console.log(`server is running on the port locolhost:${PORT}`);
     });
   })
