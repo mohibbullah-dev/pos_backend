@@ -1,7 +1,7 @@
 import { User } from "../model/user.model.js";
 import { apiError } from "../utils/apiError.js";
 import asyncHandler from "../utils/asyncHandler.js";
-import { cloudinaryImageUpload } from "../utils/cloudinary";
+import { cloudinaryImageUpload } from "../utils/cloudinary.js";
 
 const signUp = asyncHandler(async (req, res) => {
   const { name, email, password, role } = req.body;
