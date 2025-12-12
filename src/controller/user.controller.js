@@ -39,6 +39,10 @@ const signUp = asyncHandler(async (req, res) => {
       email,
       password,
       role,
+      avatar: {
+        url: cloudinaryRes.secure_url,
+        public_id: cloudinaryRes.public_id,
+      },
     }).select("-password");
 
     if (!createUser)
