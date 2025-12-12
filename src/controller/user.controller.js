@@ -37,6 +37,7 @@ const signUp = asyncHandler(async (req, res) => {
     const createUser = await User.create({
       name,
       email,
+      phone,
       password,
       role,
       avatar: {
