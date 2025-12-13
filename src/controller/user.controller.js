@@ -13,7 +13,17 @@ import {
 } from "../utils/token.js";
 import crypto from "crypto";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import { REFRESH_TOKNE_SECRET } from "../constant.js";
+
+const cookieOptions = {
+  httpOnly: true,
+  secure: true,
+  sameSite: "none",
+  path: "/renewAccessToken",
+  maxAge: 10 * 24 * 60 * 60 * 1000,
+};
+
 const signUp = asyncHandler(async (req, res) => {
   const { name, email, password, role, phone } = req.body;
   const localPath = req.file.path;
@@ -118,6 +128,32 @@ const logIn = asyncHandler(async (req, res) => {
     .json(new apiSuccess(200, "login successful", { accesstoken }));
 });
 
+const logOut = asyncHandler(async (req, res) => {
+  const refreToken = req.cookies?.refreshToken;
+
+  if (refreToken) {
+    const payload = await jwt.verify(refreToken, REFRESH_TOKNE_SECRET);
+    const sessions = await RefreshSession.find({
+      userId: payload.id,
+      revokedAt: null,
+    });
+    console.log("sessions :", sessions);
+    if (!sessions.length === 0) {
+      for (s of sessions) {
+        const ok = await conpareHashToken(refreToken, s.tokenHash);
+        if (ok) {
+          s.revokedAt = new Date();
+          await s.save({ validateBeforeSave: false });
+          break;
+        }
+      }
+    }
+  }
+
+  res.clearCookie("refreshToken", cookieOptions);
+  return res.status(200).json(new apiSuccess(200, "logOut successfully"));
+});
+
 const generateNewAccessToken = asyncHandler(async (req, res) => {
   const incomeingRefreshToken = req.cookies?.accessToken;
   if (!incomeingRefreshToken) throw new apiError(400, "token not found");
@@ -161,4 +197,4 @@ const generateNewAccessToken = asyncHandler(async (req, res) => {
   });
 });
 
-export { signUp, logIn, generateNewAccessToken };
+export { signUp, logIn, generateNewAccessToken, logOut };
