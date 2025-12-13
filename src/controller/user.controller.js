@@ -58,4 +58,10 @@ const signUp = asyncHandler(async (req, res) => {
   }
 });
 
+const logIn = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password)
+    throw new apiError(400, "email & appword are required");
+});
+
 export { signUp };
