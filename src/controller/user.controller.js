@@ -109,7 +109,9 @@ const logIn = asyncHandler(async (req, res) => {
 
   res.cookie("accessToken", refreToken, cookieOptions);
 
-  return res.status(200).json({ accesstoken });
+  return res
+    .status(200)
+    .json(new apiSuccess(200, "login successful", { accesstoken }));
 });
 
 export { signUp, logIn };
