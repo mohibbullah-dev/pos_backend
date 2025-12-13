@@ -1,5 +1,7 @@
 import { Schema, mongoose } from "mongoose";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { JWT_TOKEN_EXPIRES_IN, JWT_TOKEN_SECRET } from "../constant";
 const userSchema = new Schema(
   {
     name: {
@@ -50,5 +52,11 @@ userSchema.pre("save", async function () {
   if (!this.isModified("password") || !this.password) return;
   this.password = await bcrypt.hash(this.password, 10);
 });
+
+userSchema.methods.jwtToken = async function () {
+  return await jwt.sign({ id: this._id }, JWT_TOKEN_SECRET, {
+    expiresIn: JWT_TOKEN_EXPIRES_IN,
+  });
+};
 
 export const User = mongoose.model("User", userSchema);
