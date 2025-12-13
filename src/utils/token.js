@@ -21,8 +21,8 @@ const generateAccessToken = async (userId) => {
   });
 };
 
-const generateRefreshToken = async (userId) => {
-  return await jwt.sign({ id: userId }, REFRESH_TOKNE_SECRET, {
+const generateRefreshToken = async (userId, jti) => {
+  return await jwt.sign({ id: userId, jti }, REFRESH_TOKNE_SECRET, {
     expiresIn: REFRESH_TOKEN_EXPIRES_IN,
   });
 };

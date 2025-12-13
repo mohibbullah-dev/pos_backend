@@ -7,7 +7,7 @@ const refreshSessionSchema = new Schema(
       ref: "User",
       required: [true, "user is required"],
     },
-    tokeHash: {
+    tokekHash: {
       type: String,
       required: true,
       index: true,

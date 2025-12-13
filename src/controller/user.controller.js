@@ -1,9 +1,15 @@
+import { RefreshSession } from "../model/refreshSession.model.js";
 import { User } from "../model/user.model.js";
 import { apiError } from "../utils/apiError.js";
 import { apiSuccess } from "../utils/apiSuccess.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import { cloudinaryImageUpload } from "../utils/cloudinary.js";
-
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  hashToken,
+} from "../utils/token.js";
+import bcrypt from "bcrypt";
 const signUp = asyncHandler(async (req, res) => {
   const { name, email, password, role, phone } = req.body;
   const localPath = req.file.path;
@@ -67,11 +73,41 @@ const logIn = asyncHandler(async (req, res) => {
   if (!user) throw new apiError(404, "user not found");
 
   const isPasswordCorrect = await user.comparePassword(password);
-  
-  if(!isPasswordCorrect) throw new apiError(400, "invalid credentials");
-  acc
 
+  if (!isPasswordCorrect) throw new apiError(400, "invalid credentials");
 
+  const accesstoken = await generateAccessToken(user._id);
+  console.log("accesstoken :", accesstoken);
+
+  const jti = bcrypt.randomUUID();
+  console.log("jti :", jti);
+  const userAgent = req.get("user-agent");
+
+  const refreToken = await generateRefreshToken(user._id, jti);
+
+  if (!accesstoken || !refreToken)
+    throw new apiError(400, "token generation failed");
+
+  const cookieOptions = {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+    path: "/renewAccessToken",
+    maxAge: 10 * 24 * 60 * 60 * 1000,
+  };
+
+  await RefreshSession.create({
+    userId: user._id,
+    tokekHash: hashToken(refreToken),
+    jti,
+    userAgent: userAgent,
+    ip: req.ip,
+    expiresAt: new Date(Date.now()) + 30 * 24 * 60 * 60 * 1000,
+  });
+
+  res.cookie("accessToken", refreToken, cookieOptions);
+
+  return res.status(200).json({ accesstoken });
 });
 
-export { signUp };
+export { signUp, logIn };
