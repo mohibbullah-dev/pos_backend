@@ -54,6 +54,7 @@ const userSchema = new Schema(
   },
   { timestamps: true }
 );
+
 userSchema.methods.comparePassword = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
@@ -62,25 +63,5 @@ userSchema.pre("save", async function () {
   if (!this.isModified("password") || !this.password) return;
   this.password = await bcrypt.hash(this.password, 10);
 });
-
-userSchema.methods.jwtToken = async function () {
-  return await jwt.sign({ id: this._id }, JWT_TOKEN_SECRET, {
-    expiresIn: JWT_TOKEN_EXPIRES_IN,
-  });
-};
-
-userSchema.methods.accessToken = async function () {
-  return await jwt.sign(
-    { id: this._id, name: this.name, email: this.email, role: this.role },
-    ACCESS_TOKEN_SECRET,
-    { expiresIn: ACCESS_TOKEN_EXPIRES_IN }
-  );
-};
-
-userSchema.methods.freshToken = async function () {
-  return await jwt.sign({ id: this._id }, REFRESH_TOKNE_SECRET, {
-    expiresIn: REFRESH_TOKEN_EXPIRES_IN,
-  });
-};
 
 export const User = mongoose.model("User", userSchema);
