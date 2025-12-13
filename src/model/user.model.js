@@ -1,7 +1,14 @@
 import { Schema, mongoose } from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { JWT_TOKEN_EXPIRES_IN, JWT_TOKEN_SECRET } from "../constant";
+import {
+  ACCESS_TOKEN_EXPIRES_IN,
+  ACCESS_TOKEN_SECRET,
+  JWT_TOKEN_EXPIRES_IN,
+  JWT_TOKEN_SECRET,
+  REFRESH_TOKEN_EXPIRES_IN,
+  REFRESH_TOKNE_SECRET,
+} from "../constant.js";
 const userSchema = new Schema(
   {
     name: {
@@ -56,6 +63,20 @@ userSchema.pre("save", async function () {
 userSchema.methods.jwtToken = async function () {
   return await jwt.sign({ id: this._id }, JWT_TOKEN_SECRET, {
     expiresIn: JWT_TOKEN_EXPIRES_IN,
+  });
+};
+
+userSchema.methods.accessToken = async function () {
+  return await jwt.sign(
+    { id: this._id, name: this.name, email: this.email, role: this.role },
+    ACCESS_TOKEN_SECRET,
+    { expiresIn: ACCESS_TOKEN_EXPIRES_IN }
+  );
+};
+
+userSchema.methods.freshToken = async function () {
+  return await jwt.sign({ id: this._id }, REFRESH_TOKNE_SECRET, {
+    expiresIn: REFRESH_TOKEN_EXPIRES_IN,
   });
 };
 
