@@ -87,11 +87,11 @@ const logIn = asyncHandler(async (req, res) => {
 
   const userAgent = req.get("user-agent");
 
-  const refreToken = await generateRefreshToken(user._id, jti);
+  const refreshToken = await generateRefreshToken(user._id, jti);
 
-  const hash_Token = await hashToken(refreToken);
+  const hash_Token = await hashToken(refreshToken);
 
-  if (!accesstoken || !refreToken)
+  if (!accesstoken || !refreshToken)
     throw new apiError(400, "token generation failed");
 
   const cookieOptions = {
@@ -111,7 +111,7 @@ const logIn = asyncHandler(async (req, res) => {
     expiredAt: new Date(Date.now()) + 30 * 24 * 60 * 60 * 1000,
   });
 
-  res.cookie("accessToken", refreToken, cookieOptions);
+  res.cookie("refreshToken", refreshToken, cookieOptions);
 
   return res
     .status(200)
