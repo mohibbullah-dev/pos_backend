@@ -62,6 +62,16 @@ const logIn = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password)
     throw new apiError(400, "email & appword are required");
+
+  const user = await User.findOne({ email }).select("-password");
+  if (!user) throw new apiError(404, "user not found");
+
+  const isPasswordCorrect = await user.comparePassword(password);
+  
+  if(!isPasswordCorrect) throw new apiError(400, "invalid credentials");
+  acc
+
+
 });
 
 export { signUp };
