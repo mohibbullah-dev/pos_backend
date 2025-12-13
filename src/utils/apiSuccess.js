@@ -7,3 +7,5 @@ class apiSuccess {
     this.meta = meta;
   }
 }
+
+export { apiSuccess };

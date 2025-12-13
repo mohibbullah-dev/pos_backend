@@ -1,5 +1,6 @@
 import { User } from "../model/user.model.js";
 import { apiError } from "../utils/apiError.js";
+import { apiSuccess } from "../utils/apiSuccess.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import { cloudinaryImageUpload } from "../utils/cloudinary.js";
 
@@ -44,10 +45,12 @@ const signUp = asyncHandler(async (req, res) => {
         url: cloudinaryRes.secure_url,
         public_id: cloudinaryRes.public_id,
       },
-    }).select("-password");
+    });
 
     if (!createUser)
       throw new apiError(500, " something went wrong when user creating");
+
+    console.log("createUser :", createUser);
 
     return res
       .status(201)
