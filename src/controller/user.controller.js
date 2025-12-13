@@ -9,7 +9,7 @@ import {
   generateRefreshToken,
   hashToken,
 } from "../utils/token.js";
-import bcrypt from "bcrypt";
+import crypto from "crypto";
 const signUp = asyncHandler(async (req, res) => {
   const { name, email, password, role, phone } = req.body;
   const localPath = req.file.path;
@@ -69,7 +69,8 @@ const logIn = asyncHandler(async (req, res) => {
   if (!email || !password)
     throw new apiError(400, "email & appword are required");
 
-  const user = await User.findOne({ email }).select("-password");
+  const user = await User.findOne({ email });
+  // .select("-password");
   if (!user) throw new apiError(404, "user not found");
 
   const isPasswordCorrect = await user.comparePassword(password);
@@ -77,13 +78,14 @@ const logIn = asyncHandler(async (req, res) => {
   if (!isPasswordCorrect) throw new apiError(400, "invalid credentials");
 
   const accesstoken = await generateAccessToken(user._id);
-  console.log("accesstoken :", accesstoken);
 
-  const jti = bcrypt.randomUUID();
-  console.log("jti :", jti);
+  const jti = crypto.randomUUID(); // node.js built-in library to make auto hash
+
   const userAgent = req.get("user-agent");
 
   const refreToken = await generateRefreshToken(user._id, jti);
+
+  const hash_Token = await hashToken(refreToken);
 
   if (!accesstoken || !refreToken)
     throw new apiError(400, "token generation failed");
@@ -98,11 +100,11 @@ const logIn = asyncHandler(async (req, res) => {
 
   await RefreshSession.create({
     userId: user._id,
-    tokekHash: hashToken(refreToken),
+    tokekHash: hash_Token,
     jti,
     userAgent: userAgent,
     ip: req.ip,
-    expiresAt: new Date(Date.now()) + 30 * 24 * 60 * 60 * 1000,
+    expiredAt: new Date(Date.now()) + 30 * 24 * 60 * 60 * 1000,
   });
 
   res.cookie("accessToken", refreToken, cookieOptions);
