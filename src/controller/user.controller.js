@@ -4,12 +4,16 @@ import { apiError } from "../utils/apiError.js";
 import { apiSuccess } from "../utils/apiSuccess.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import { cloudinaryImageUpload } from "../utils/cloudinary.js";
+
 import {
   generateAccessToken,
   generateRefreshToken,
   hashToken,
+  conpareHashToken,
 } from "../utils/token.js";
 import crypto from "crypto";
+import bcrypt from "bcrypt";
+import { REFRESH_TOKNE_SECRET } from "../constant.js";
 const signUp = asyncHandler(async (req, res) => {
   const { name, email, password, role, phone } = req.body;
   const localPath = req.file.path;
@@ -100,7 +104,7 @@ const logIn = asyncHandler(async (req, res) => {
 
   await RefreshSession.create({
     userId: user._id,
-    tokekHash: hash_Token,
+    tokenHash: hash_Token,
     jti,
     userAgent: userAgent,
     ip: req.ip,
@@ -114,4 +118,47 @@ const logIn = asyncHandler(async (req, res) => {
     .json(new apiSuccess(200, "login successful", { accesstoken }));
 });
 
-export { signUp, logIn };
+const generateNewAccessToken = asyncHandler(async (req, res) => {
+  const incomeingRefreshToken = req.cookies?.accessToken;
+  if (!incomeingRefreshToken) throw new apiError(400, "token not found");
+  let payload;
+
+  try {
+    payload = await bcrypt.verify(incomeingRefreshToken, REFRESH_TOKNE_SECRET);
+  } catch (error) {
+    throw new apiError(400, "invalid refreshToken");
+  }
+  const session = await RefreshSession.findOne({
+    userId: payload?.id,
+    revokedAt: null,
+  });
+  if (!session) throw new apiError("404", "refreshToken not found");
+
+  const jti = crypto.randomUUID(); // node.js built-in library to make auto hash
+  const userAgent = req.get("user-agent");
+
+  const isMatch = await conpareHashToken(
+    incomeingRefreshToken,
+    session?.tokenHash
+  );
+  if (!isMatch) throw new apiError(400, "refreshToke dosen't match");
+
+  const newAccessToken = await generateRefreshToken(session.id);
+
+  const hashToken = await hashToken(newAccessToken);
+
+  session.revokedAt = new Date();
+  session.replaceByTokenHash = newHash;
+  await session.save({ validateBeforeSave: true });
+
+  await RefreshSession.create({
+    userId: payload._id,
+    tokenHash: hashToken,
+    jti,
+    userAgent: userAgent,
+    ip: req.ip,
+    expiredAt: new Date(Date.now()) + 30 * 24 * 60 * 60 * 1000,
+  });
+});
+
+export { signUp, logIn, generateNewAccessToken };
