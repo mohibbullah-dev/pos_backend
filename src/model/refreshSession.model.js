@@ -37,4 +37,7 @@ const refreshSessionSchema = new Schema(
   { timestamps: true }
 );
 
-export const RefreshSession = mongoose.model("RefreshSession", RefreshSession);
+export const RefreshSession = mongoose.model(
+  "RefreshSession",
+  refreshSessionSchema
+);

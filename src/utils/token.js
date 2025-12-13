@@ -7,7 +7,7 @@ import {
   JWT_TOKEN_SECRET,
   REFRESH_TOKEN_EXPIRES_IN,
   REFRESH_TOKNE_SECRET,
-} from "../constant";
+} from "../constant.js";
 
 const generateJwtToken = async (userId) => {
   return await jwt.sign({ id: userId }, JWT_TOKEN_SECRET, {

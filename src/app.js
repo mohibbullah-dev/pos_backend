@@ -9,11 +9,6 @@ app.use(express.static("public"));
 app.use(express.json({ limit: "16kb" }));
 app.use(cookiePaser());
 
-app.get("/", (req, res) => {
-  console.log("this route test");
-  res.status(200).json({ message: "hello world" });
-});
-
 // route start from here
 
 import userRoute from "./route/user.router.js";
