@@ -52,8 +52,6 @@ const signUp = asyncHandler(async (req, res) => {
     public_id: Date.now(),
   });
 
-  console.log("cloudinaryRes :", cloudinaryRes);
-
   if (cloudinaryRes.secure_url && cloudinaryRes.public_id) {
     const createUser = await User.create({
       name,
@@ -90,14 +88,12 @@ const logIn = asyncHandler(async (req, res) => {
   const isPasswordCorrect = await user.comparePassword(password);
 
   if (!isPasswordCorrect) throw new apiError(400, "invalid credentials");
-
-  const accesstoken = await generateAccessToken(user._id);
-
   const jti = crypto.randomUUID(); // node.js built-in library to make auto hash
 
-  const userAgent = req.get("user-agent");
-
+  const accesstoken = await generateAccessToken(user._id);
   const refreshToken = await generateRefreshToken(user._id, jti);
+
+  const userAgent = req.get("user-agent");
 
   const hash_Token = await hashToken(refreshToken);
 

@@ -4,21 +4,23 @@ import { apiError } from "../utils/apiError.js";
 import jwt from "jsonwebtoken";
 
 const verifyToken = async (req, res, next) => {
-  const token = res.data?.data?.accesstoken;
-  if (!token) throw new apiError(400, "accessToken is not found");
+  const authHeader = req.headers?.authorization;
+  console.log("token :", authHeader);
 
-  let decodedToken;
+  if (!authHeader || !authHeader.startsWith("Bearer "))
+    throw new apiError(400, "accessToken is not found");
+
+  const token = authHeader.split(" ")[1];
 
   try {
-    decodedToken = await jwt.verify(token, ACCESS_TOKEN_SECRET);
-    if (decodedToken?.id) {
-      const user = await User.findById(decodedToken?.id).select("-password");
-      if (!user) throw new apiError(404, "user not found");
-      req.user = user._id;
-      next();
-    }
+    const decodedToken = await jwt.verify(token, ACCESS_TOKEN_SECRET);
+    const user = await User.findById(decodedToken?.id);
+    console.log("user :", user);
+    if (!user) throw new apiError(404, "user not found");
+    req.user = user;
+    next();
   } catch (error) {
-    throw new apiError(400, "invalid access token");
+    throw new apiError(400, "invalid or exipred accessToken");
   }
 };
 
