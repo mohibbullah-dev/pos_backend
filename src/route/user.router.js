@@ -13,8 +13,7 @@ router
   .route("/signup")
   .post(multerAvaterUpload.single("restaurantAvater"), signUp);
 router.route("/login").post(logIn);
-
-router.route("/refreshTokn").post(generateNewAccessToken);
 router.route("/logOut").post(verifyToken, logOut);
+router.route("/refreshTokn").post(generateNewAccessToken);
 
 export default router;

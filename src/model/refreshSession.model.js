@@ -29,9 +29,11 @@ const refreshSessionSchema = new Schema(
       type: Date,
       default: null,
     },
-    replaceByTokenHash: {
+    currentStatus: {
       type: String,
-      default: null,
+      required: true,
+      enum: ["logedIn", "logedOut"],
+      default: "logedIn",
     },
   },
   { timestamps: true }

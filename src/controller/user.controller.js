@@ -20,7 +20,7 @@ const cookieOptions = {
   httpOnly: true,
   secure: true,
   sameSite: "none",
-  path: "/renewAccessToken",
+  // path: "/renewAccessToken",
   maxAge: 10 * 24 * 60 * 60 * 1000,
 };
 
@@ -100,14 +100,6 @@ const logIn = asyncHandler(async (req, res) => {
   if (!accesstoken || !refreshToken)
     throw new apiError(400, "token generation failed");
 
-  const cookieOptions = {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-    path: "/renewAccessToken",
-    maxAge: 10 * 24 * 60 * 60 * 1000,
-  };
-
   await RefreshSession.create({
     userId: user._id,
     tokenHash: hash_Token,
@@ -126,71 +118,90 @@ const logIn = asyncHandler(async (req, res) => {
 
 const logOut = asyncHandler(async (req, res) => {
   const refreToken = req.cookies?.refreshToken;
+  console.log("refreToken :", refreToken);
+  console.log("refreToken :", refreToken);
 
-  if (refreToken) {
-    const payload = await jwt.verify(refreToken, REFRESH_TOKNE_SECRET);
-    const sessions = await RefreshSession.find({
-      userId: payload.id,
-      revokedAt: null,
-    });
-    console.log("sessions :", sessions);
-    if (!sessions.length === 0) {
-      for (s of sessions) {
-        const ok = await conpareHashToken(refreToken, s.tokenHash);
-        if (ok) {
-          s.revokedAt = new Date();
-          await s.save({ validateBeforeSave: false });
-          break;
-        }
-      }
-    }
-  }
+  if (!refreToken) throw new apiError(400, "refreshToken not found");
+
+  const payload = await jwt.verify(refreToken, REFRESH_TOKNE_SECRET);
+  console.log("payload :", payload);
+
+  if (!payload?.id)
+    throw new apiError(400, "refreshToken dosen't contain valid info");
+
+  const session = await RefreshSession.findOne({
+    userId: payload?.id,
+    currentStatus: "logedIn",
+  });
+  if (!session) throw new apiError(400, "session not found");
+
+  const isMatchHashedToken = await conpareHashToken(
+    refreToken,
+    session.tokenHash
+  );
+  if (!isMatchHashedToken) throw new apiError(400, "tokenHash no match");
+  console.log("");
+  session.tokenHash = null;
+  session.revokedAt = new Date();
+  session.currentStatus = "logedOut";
+  await session.save({ validateBeforeSave: false });
 
   res.clearCookie("refreshToken", cookieOptions);
   return res.status(200).json(new apiSuccess(200, "logOut successfully"));
 });
 
 const generateNewAccessToken = asyncHandler(async (req, res) => {
-  const incomeingRefreshToken = req.cookies?.accessToken;
+  const incomeingRefreshToken = req.cookies?.refreshToken;
   if (!incomeingRefreshToken) throw new apiError(400, "token not found");
-  let payload;
 
-  try {
-    payload = await bcrypt.verify(incomeingRefreshToken, REFRESH_TOKNE_SECRET);
-  } catch (error) {
-    throw new apiError(400, "invalid refreshToken");
-  }
-  const session = await RefreshSession.findOne({
+  const payload = await jwt.verify(incomeingRefreshToken, REFRESH_TOKNE_SECRET);
+
+  if (!payload.id)
+    throw new apiError(400, "refreshToken dosen't contain valid info");
+
+  const sessions = await RefreshSession.find({
     userId: payload?.id,
     revokedAt: null,
   });
-  if (!session) throw new apiError("404", "refreshToken not found");
+
+  const newRefreshToken = await generateRefreshToken(payload.id);
+  const newAccessToken = await generateRefreshToken(payload.id);
 
   const jti = crypto.randomUUID(); // node.js built-in library to make auto hash
   const userAgent = req.get("user-agent");
 
-  const isMatch = await conpareHashToken(
-    incomeingRefreshToken,
-    session?.tokenHash
+  if (!sessions.length === 0) throw new apiError(400, "no refreshToken");
+
+  for (const s of sessions) {
+    const ok = await conpareHashToken(incomeingRefreshToken, s.tokenHash);
+    if (ok) {
+      s.revokedAt = new Date();
+      await s.save({ validateBeforeSave: false });
+
+      const hashToken = await hashToken(newRefreshToken);
+      s.replaceByTokenHash = hashToken;
+
+      await RefreshSession.create({
+        userId: payload._id,
+        tokenHash: hashToken,
+        jti,
+        userAgent: userAgent,
+        ip: req.ip,
+        expiredAt: new Date(Date.now()) + 30 * 24 * 60 * 60 * 1000,
+      });
+
+      await s.save({ validateBeforeSave: true });
+      break;
+    }
+  }
+
+  res.cookie("refreshToken", newRefreshToken, cookieOptions);
+
+  return res.status(200).json(
+    new apiSuccess(200, "regenerated accessToken successfully", {
+      newAccessToken,
+    })
   );
-  if (!isMatch) throw new apiError(400, "refreshToke dosen't match");
-
-  const newAccessToken = await generateRefreshToken(session.id);
-
-  const hashToken = await hashToken(newAccessToken);
-
-  session.revokedAt = new Date();
-  session.replaceByTokenHash = newHash;
-  await session.save({ validateBeforeSave: true });
-
-  await RefreshSession.create({
-    userId: payload._id,
-    tokenHash: hashToken,
-    jti,
-    userAgent: userAgent,
-    ip: req.ip,
-    expiredAt: new Date(Date.now()) + 30 * 24 * 60 * 60 * 1000,
-  });
 });
 
 export { signUp, logIn, generateNewAccessToken, logOut };
