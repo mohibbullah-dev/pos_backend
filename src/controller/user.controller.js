@@ -140,7 +140,6 @@ const logOut = asyncHandler(async (req, res) => {
     session.tokenHash
   );
   if (!isMatchHashedToken) throw new apiError(400, "tokenHash no match");
-  console.log("");
   session.tokenHash = null;
   session.revokedAt = new Date();
   session.currentStatus = "logedOut";
@@ -151,49 +150,34 @@ const logOut = asyncHandler(async (req, res) => {
 });
 
 const generateNewAccessToken = asyncHandler(async (req, res) => {
-  const incomeingRefreshToken = req.cookies?.refreshToken;
-  if (!incomeingRefreshToken) throw new apiError(400, "token not found");
+  const refreToken = req.cookies?.refreshToken;
+  if (!refreToken) throw new apiError(400, "refreToken not found");
 
-  const payload = await jwt.verify(incomeingRefreshToken, REFRESH_TOKNE_SECRET);
+  const payload = await jwt.verify(refreToken, REFRESH_TOKNE_SECRET);
 
-  if (!payload.id)
+  if (!payload?.id)
     throw new apiError(400, "refreshToken dosen't contain valid info");
 
-  const sessions = await RefreshSession.find({
+  const session = await RefreshSession.findOne({
     userId: payload?.id,
-    revokedAt: null,
+    currentStatus: "logedIn",
   });
 
-  const newRefreshToken = await generateRefreshToken(payload.id);
-  const newAccessToken = await generateRefreshToken(payload.id);
+  if (!session) throw new apiError(400, "session not found");
 
-  const jti = crypto.randomUUID(); // node.js built-in library to make auto hash
-  const userAgent = req.get("user-agent");
+  const newRefreshToken = await generateRefreshToken(payload?.id);
+  const newAccessToken = await generateAccessToken(payload?.id);
 
-  if (!sessions.length === 0) throw new apiError(400, "no refreshToken");
+  // const jti = crypto.randomUUID();
+  // const userAgent = req.get("user-agent");
 
-  for (const s of sessions) {
-    const ok = await conpareHashToken(incomeingRefreshToken, s.tokenHash);
-    if (ok) {
-      s.revokedAt = new Date();
-      await s.save({ validateBeforeSave: false });
+  // if (!sessions.length === 0) throw new apiError(400, "no refreshToken");
+  const isMatch = await conpareHashToken(refreToken, session?.tokenHash);
+  if (!isMatch) throw new apiError(400, "tokenHashed no match");
+  const hashToken = await hashToken(newRefreshToken);
 
-      const hashToken = await hashToken(newRefreshToken);
-      s.replaceByTokenHash = hashToken;
-
-      await RefreshSession.create({
-        userId: payload._id,
-        tokenHash: hashToken,
-        jti,
-        userAgent: userAgent,
-        ip: req.ip,
-        expiredAt: new Date(Date.now()) + 30 * 24 * 60 * 60 * 1000,
-      });
-
-      await s.save({ validateBeforeSave: true });
-      break;
-    }
-  }
+  session.tokenHash = hashToken;
+  session.currentStatus = "logedIn";
 
   res.cookie("refreshToken", newRefreshToken, cookieOptions);
 
