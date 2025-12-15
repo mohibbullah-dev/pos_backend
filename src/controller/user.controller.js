@@ -174,9 +174,9 @@ const generateNewAccessToken = asyncHandler(async (req, res) => {
   // if (!sessions.length === 0) throw new apiError(400, "no refreshToken");
   const isMatch = await conpareHashToken(refreToken, session?.tokenHash);
   if (!isMatch) throw new apiError(400, "tokenHashed no match");
-  const hashToken = await hashToken(newRefreshToken);
+  const newHashToken = await hashToken(newRefreshToken);
 
-  session.tokenHash = hashToken;
+  session.tokenHash = newHashToken;
   session.currentStatus = "logedIn";
 
   res.cookie("refreshToken", newRefreshToken, cookieOptions);
