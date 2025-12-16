@@ -24,7 +24,14 @@ const orderSchema = new Schema(
       tax: { type: Number, required: true },
       totalWithTax: { type: Number, required: true },
     },
-    items: [],
+    items: {
+      type: Array,
+      require: true,
+      validate: {
+        validator: (v) => Array.isArray(v) && v.length > 0,
+        message: "at least one item is required",
+      },
+    },
   },
 
   { timestamps: true }
