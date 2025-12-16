@@ -1,4 +1,4 @@
-import { Order } from "../model/order.model";
+import { Order } from "../model/order.model.js";
 import { apiError } from "../utils/apiError.js";
 import { apiSuccess } from "../utils/apiSuccess.js";
 import asyncHandler from "../utils/asyncHandler.js";
@@ -58,7 +58,9 @@ const updateOrder = asyncHandler(async (req, res) => {
   order.orderStatus = "Ready";
   await order.save({ validateBeforeSave: false });
 
-  return res.status(200).json(new apiSuccess(200, "orderUpdate", order));
+  return res
+    .status(200)
+    .json(new apiSuccess(200, "order Updated successfully", order));
 });
 
 export { addOrder, getOrder, updateOrder, getOrders };
