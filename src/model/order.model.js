@@ -32,6 +32,10 @@ const orderSchema = new Schema(
         message: "at least one item is required",
       },
     },
+    table: {
+      type: Schema.Types.ObjectId,
+      ref: "Table",
+    },
   },
 
   { timestamps: true }
