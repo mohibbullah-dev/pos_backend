@@ -3,6 +3,7 @@ import {
   generateNewAccessToken,
   logIn,
   logOut,
+  me,
   signUp,
 } from "../controller/user.controller.js";
 import { multerAvaterUpload } from "../middleware/fileUpload.js";
@@ -15,5 +16,6 @@ router
 router.route("/login").post(logIn);
 router.route("/logOut").post(verifyToken, logOut);
 router.route("/refreshTokn").post(generateNewAccessToken);
+router.route("/me").get(verifyToken, me);
 
 export default router;
