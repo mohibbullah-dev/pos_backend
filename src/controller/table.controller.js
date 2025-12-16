@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Table } from "../model/table.model.js";
 import { apiError } from "../utils/apiError.js";
 import { apiSuccess } from "../utils/apiSuccess.js";
@@ -30,8 +31,10 @@ const getTables = asyncHandler(async (req, res) => {
 const updateTable = asyncHandler(async (req, res) => {
   const { tableStatus, currentOrder } = req.body;
   const tableId = req.params?.id;
-  if (!tableStatus || !currentOrder || !tableId)
+  if (!tableStatus || !currentOrder)
     throw new apiError(400, "all file are required", updateTable);
+  if (!mongoose.Types.ObjectId.isValid(tableId))
+    throw new apiError(400, "it's not a valide ObjectId");
 
   const table = await Table.findByIdAndUpdate(
     tableId,

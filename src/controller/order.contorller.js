@@ -33,7 +33,8 @@ const addOrder = asyncHandler(async (req, res) => {
 
 const getOrder = asyncHandler(async (req, res) => {
   const orderId = req.params?.id;
-  if (!orderId) throw new apiError(400, "order is required");
+  if (!mongoose.Types.ObjectId.isValid(orderId))
+    throw new apiError(400, "it's not a valide ObjectId");
   const order = await Order.findById(orderId);
   if (!order) throw new apiError(404, "order not found");
   return res
@@ -52,7 +53,8 @@ const getOrders = asyncHandler(async (req, res) => {
 
 const updateOrder = asyncHandler(async (req, res) => {
   const orderId = req.params?.id;
-  if (!orderId) throw new apiError(400, "order is required");
+  if (!mongoose.Types.ObjectId.isValid(orderId))
+    throw new apiError(400, "it's not a valide ObjectId");
   const order = await Order.findById(orderId);
   if (!order) throw new apiError(404, "order not found");
   order.orderStatus = "Ready";
