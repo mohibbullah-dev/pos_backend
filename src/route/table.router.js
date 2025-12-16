@@ -1,10 +1,8 @@
 import { Router } from "express";
-import verifyToken from "../middleware/verifyToken";
+import verifyToken from "../middleware/verifyToken.js";
+import { addTables } from "../controller/table.controller.js";
 
 const router = Router();
-
-router.route("/addTable").post(verifyToken, addTable);
-router.route("/gettable").get(verifyToken, getTable);
-router.route("/updateTable").put(verifyToken, updateTable);
+router.route("/addTable").post(verifyToken, addTables);
 
 export default router;

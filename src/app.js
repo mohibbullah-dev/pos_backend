@@ -20,5 +20,4 @@ app.use("/api/v1/orders", orderRoute);
 app.use("/api/v1/tables", tableRoute);
 
 app.use(errorHandler);
-
 export { app };
