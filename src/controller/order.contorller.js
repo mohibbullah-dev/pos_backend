@@ -10,7 +10,7 @@ const addOrder = asyncHandler(async (req, res) => {
     Object.keys(customerDetails).length === 0 ||
     Object.keys(bills).length === 0 ||
     !orderStatus ||
-    (!Array.isArray(items) === items.length) === 0 ||
+    (!Array.isArray(items) || items.length) === 0 ||
     !userId
   )
     throw new apiError(
@@ -41,4 +41,24 @@ const getOrder = asyncHandler(async (req, res) => {
     .json(new apiSuccess(200, "order fetched successfully", order));
 });
 
-export { addOrder, getOrder };
+const getOrders = asyncHandler(async (req, res) => {
+  const orders = await Order.find();
+  if (orders.length === 0 || !Array.isArray(orders))
+    throw new apiError(404, "order not found");
+  return res
+    .status(200)
+    .json(new apiSuccess(200, "orders fetched successfully", orders));
+});
+
+const updateOrder = asyncHandler(async (req, res) => {
+  const orderId = req.params?.id;
+  if (!orderId) throw new apiError(400, "order is required");
+  const order = await Order.findById(orderId);
+  if (!order) throw new apiError(404, "order not found");
+  order.orderStatus = "Ready";
+  await order.save({ validateBeforeSave: false });
+
+  return res.status(200).json(new apiSuccess(200, "orderUpdate", order));
+});
+
+export { addOrder, getOrder, updateOrder, getOrders };

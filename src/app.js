@@ -12,8 +12,10 @@ app.use(cookiePaser());
 // route start from here
 
 import userRoute from "./route/user.router.js";
+import orderRoute from "./route/order.router.js";
 
 app.use("/api/v1/users", userRoute);
+app.use("/api/v1/orders", orderRoute);
 
 app.use(errorHandler);
 
