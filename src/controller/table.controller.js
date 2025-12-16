@@ -18,4 +18,13 @@ const addTables = asyncHandler(async (req, res) => {
     .json(new apiSuccess(201, "Table Created successfully", table));
 });
 
-export { addTables };
+const getTables = asyncHandler(async (req, res) => {
+  const tables = await Table.find();
+  if (!Array.isArray(tables) || !tables.length > 0)
+    throw new apiError(404, "tables not founds");
+  return res
+    .status(200)
+    .json(new apiSuccess(200, "all tables fetched", tables));
+});
+
+export { addTables, getTables };
