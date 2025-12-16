@@ -7,7 +7,11 @@ const tableSchema = new Schema(
       required: true,
       unique: true,
     },
-    status: { type: String, required: true },
+    tableStatus: {
+      type: String,
+      enum: ["Available", "Booked"],
+      default: "Available",
+    },
     currentOrder: {
       type: Schema.Types.ObjectId,
       ref: "Order",
