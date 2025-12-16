@@ -7,13 +7,17 @@ const orderSchema = new Schema(
       phone: { type: String, required: true },
       guests: { type: Number, required: true },
     },
+    createdBy: {
+      type: Schema.Types.ObjectId,
+      required: true,
+    },
     orderStatus: {
       type: String,
       required: true,
     },
     orderDate: {
       type: Date,
-      required: true,
+      default: Date.now(),
     },
     bills: {
       total: { type: Number, required: true },
