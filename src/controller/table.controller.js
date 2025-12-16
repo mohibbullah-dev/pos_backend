@@ -27,4 +27,21 @@ const getTables = asyncHandler(async (req, res) => {
     .json(new apiSuccess(200, "all tables fetched", tables));
 });
 
-export { addTables, getTables };
+const updateTable = asyncHandler(async (req, res) => {
+  const { tableStatus, currentOrder } = req.body;
+  const tableId = req.params?.id;
+  if (!tableStatus || !currentOrder || !tableId)
+    throw new apiError(400, "all file are required", updateTable);
+
+  const table = await Table.findByIdAndUpdate(
+    tableId,
+    { tableStatus, currentOrder },
+    { new: true }
+  );
+  if (!table) throw new apiError(404, "table not found");
+  return res
+    .status(200)
+    .json(new apiSuccess(200, "table updated successfully", table));
+});
+
+export { addTables, getTables, updateTable };
