@@ -31,4 +31,14 @@ const addOrder = asyncHandler(async (req, res) => {
     .json(new apiSuccess(201, "order created successfully", order));
 });
 
-export { addOrder };
+const getOrder = asyncHandler(async (req, res) => {
+  const orderId = req.params?.id;
+  if (!orderId) throw new apiError(400, "order is required");
+  const order = await Order.findById(orderId);
+  if (!order) throw new apiError(404, "order not found");
+  return res
+    .status(200)
+    .json(new apiSuccess(200, "order fetched successfully", order));
+});
+
+export { addOrder, getOrder };
