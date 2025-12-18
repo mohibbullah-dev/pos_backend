@@ -81,7 +81,7 @@ const logIn = asyncHandler(async (req, res) => {
   if (!email || !password)
     throw new apiError(400, "email & appword are required");
 
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email }).select("-password");
   // .select("-password");
   if (!user) throw new apiError(404, "user not found");
 
@@ -106,14 +106,14 @@ const logIn = asyncHandler(async (req, res) => {
     jti,
     userAgent: userAgent,
     ip: req.ip,
-    expiredAt: new Date(Date.now()) + 30 * 24 * 60 * 60 * 1000,
+    expiredAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
   });
 
   res.cookie("refreshToken", refreshToken, cookieOptions);
 
   return res
     .status(200)
-    .json(new apiSuccess(200, "login successful", { accesstoken }));
+    .json(new apiSuccess(200, "login successful", { accesstoken, user }));
 });
 
 const logOut = asyncHandler(async (req, res) => {
