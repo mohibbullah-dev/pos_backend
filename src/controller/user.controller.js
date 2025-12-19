@@ -81,7 +81,7 @@ const logIn = asyncHandler(async (req, res) => {
   if (!email || !password)
     throw new apiError(400, "email & appword are required");
 
-  const user = await User.findOne({ email }).select("-password");
+  const user = await User.findOne({ email }).select("+password");
   // .select("-password");
   if (!user) throw new apiError(404, "user not found");
 
@@ -111,9 +111,13 @@ const logIn = asyncHandler(async (req, res) => {
 
   res.cookie("refreshToken", refreshToken, cookieOptions);
 
+  // delete password
+  userObj = user.toObject();
+  delete userObj.password;
+
   return res
     .status(200)
-    .json(new apiSuccess(200, "login successful", { accesstoken, user }));
+    .json(new apiSuccess(200, "login successful", { accesstoken, userObj }));
 });
 
 const logOut = asyncHandler(async (req, res) => {
