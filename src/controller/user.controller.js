@@ -33,6 +33,7 @@ const signUp = asyncHandler(async (req, res) => {
   console.log("role :", role);
   console.log("phone :", phone);
   console.log("localPath :", localPath);
+  console.log("req.boy from frontend :", req.body)
 
   if (!name || !email || !password || !role || !phone || !localPath)
     throw new apiError(400, "all fields are required");
