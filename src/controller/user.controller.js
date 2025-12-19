@@ -112,7 +112,7 @@ const logIn = asyncHandler(async (req, res) => {
   res.cookie("refreshToken", refreshToken, cookieOptions);
 
   // delete password
-  userObj = user.toObject();
+  const userObj = user.toObject();
   delete userObj.password;
 
   return res
