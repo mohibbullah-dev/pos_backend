@@ -16,6 +16,10 @@ const tableSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Order",
     },
+    seatNo: {
+      type: Number,
+      require: true,
+    },
   },
   { timestamps: true }
 );

@@ -5,13 +5,15 @@ import { apiSuccess } from "../utils/apiSuccess.js";
 import asyncHandler from "../utils/asyncHandler.js";
 
 const addTables = asyncHandler(async (req, res) => {
-  const { tableNo } = req.body;
-  if (!tableNo) throw new apiError(400, "rable is required");
+  const { tableNo, seatNo } = req.body;
+  if (!tableNo || !seatNo)
+    throw new apiError(400, "tableNo & seatNo are required");
   const exist = await Table.findOne({ tableNo });
   if (exist) throw new apiError(400, "table aready exists");
 
   const table = await Table.create({
     tableNo,
+    seatNo,
   });
 
   return res

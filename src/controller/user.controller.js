@@ -200,7 +200,7 @@ const generateNewAccessToken = asyncHandler(async (req, res) => {
 
 const me = asyncHandler(async (req, res) => {
   const userId = req.user?.id;
-  const user = await User.findById(userId).select("-password");
+  const user = await User.findById(userId);
   if (!user) throw new apiError(404, "user not found");
 
   return res.status(200).json(new apiSuccess(200, "fetched my info", user));
