@@ -3,18 +3,15 @@ import mongoose, { Schema } from "mongoose";
 const itemSchema = new Schema({
   name: {
     type: String,
-    required: {
-      type: String,
-      required: [true, "dish is required"],
-    },
-    price: {
-      type: Number,
-      require: [true, "price is required"],
-    },
-    category: {
-      type: String,
-      required: [true, "category is required"],
-    },
+    required: [true, "dish is required"],
+  },
+  price: {
+    type: Number,
+    require: [true, "price is required"],
+  },
+  category: {
+    type: String,
+    required: [true, "category is required"],
   },
 });
 const menuSchema = new Schema(
@@ -28,8 +25,16 @@ const menuSchema = new Schema(
     createdBy: {
       type: Schema.Types.ObjectId,
       ref: "User",
+      required: [true, "Creator is required"],
     },
-    dishes: [itemSchema],
+    dishes: {
+      type: [itemSchema],
+      required: true,
+      validate: {
+        validator: (v) => Array.isArray(v) || v.length > 0,
+        message: "at least one item is required",
+      },
+    },
   },
   { timestamps: true }
 );
