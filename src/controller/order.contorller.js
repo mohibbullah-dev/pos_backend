@@ -4,14 +4,15 @@ import { apiSuccess } from "../utils/apiSuccess.js";
 import asyncHandler from "../utils/asyncHandler.js";
 
 const addOrder = asyncHandler(async (req, res) => {
-  const { customerDetails, orderStatus, bills, items } = req.body;
+  const { customerDetails, orderStatus, bills, items, table } = req.body;
   const userId = req.user?.id;
   if (
     Object.keys(customerDetails).length === 0 ||
     Object.keys(bills).length === 0 ||
     !orderStatus ||
     (!Array.isArray(items) || items.length) === 0 ||
-    !userId
+    !userId ||
+    !table
   )
     throw new apiError(400, "all fields are required");
 
@@ -21,6 +22,7 @@ const addOrder = asyncHandler(async (req, res) => {
     createdBy: userId,
     bills,
     items,
+    table,
   });
 
   return res
