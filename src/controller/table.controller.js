@@ -23,8 +23,7 @@ const addTables = asyncHandler(async (req, res) => {
 
 const getTables = asyncHandler(async (req, res) => {
   const tables = await Table.find();
-  if (!Array.isArray(tables) || !tables.length > 0)
-    throw new apiError(404, "tables not founds");
+  if (tables.length === 0) throw new apiSuccess(200, "no tables yet");
   return res
     .status(200)
     .json(new apiSuccess(200, "all tables fetched", tables));

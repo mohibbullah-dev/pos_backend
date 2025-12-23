@@ -13,10 +13,7 @@ const addOrder = asyncHandler(async (req, res) => {
     (!Array.isArray(items) || items.length) === 0 ||
     !userId
   )
-    throw new apiError(
-      400,
-      "custormerDetails, bills,orderStatus, createdBy and items are required"
-    );
+    throw new apiError(400, "all fields are required");
 
   const order = await Order.create({
     customerDetails,
@@ -43,7 +40,17 @@ const getOrder = asyncHandler(async (req, res) => {
 });
 
 const getOrders = asyncHandler(async (req, res) => {
-  const orders = await Order.find();
+  const orders = await Order.aggregate([
+    { $match: {} },
+    {
+      $lookup: {
+        from: "tables",
+        localField: "table",
+        foreignField: "_id",
+        as: "table",
+      },
+    },
+  ]);
   if (orders.length === 0 || !Array.isArray(orders))
     throw new apiError(404, "order not found");
   return res

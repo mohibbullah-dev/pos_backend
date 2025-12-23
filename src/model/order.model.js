@@ -35,6 +35,7 @@ const orderSchema = new Schema(
     table: {
       type: Schema.Types.ObjectId,
       ref: "Table",
+      required: [true, "table is required"],
     },
   },
 

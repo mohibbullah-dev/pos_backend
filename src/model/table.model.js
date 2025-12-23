@@ -12,10 +12,10 @@ const tableSchema = new Schema(
       enum: ["Available", "Booked"],
       default: "Available",
     },
-    currentOrder: {
-      type: Schema.Types.ObjectId,
-      ref: "Order",
-    },
+    // currentOrder: {
+    //   type: Schema.Types.ObjectId,
+    //   ref: "Order",
+    // },
     seatNo: {
       type: Number,
       require: true,
