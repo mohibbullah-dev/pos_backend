@@ -14,6 +14,8 @@ const userSchema = new Schema(
     name: {
       type: String,
       required: [true, "name is required"],
+      trim: true,
+      unique: true,
     },
     email: {
       type: String,
@@ -22,6 +24,8 @@ const userSchema = new Schema(
         return /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(v);
       },
       message: "Please enter valid email",
+      trim: true,
+      unique: true,
     },
     avatar: {
       url: {
