@@ -1,4 +1,4 @@
-import { Schema } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const itemSchema = new Schema({
   name: {
@@ -33,3 +33,5 @@ const menuSchema = new Schema(
   },
   { timestamps: true }
 );
+
+export const Menu = mongoose.model("Menu", menuSchema);
