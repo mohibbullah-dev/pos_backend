@@ -1,5 +1,6 @@
 import { Menu } from "../model/menu.model";
 import { apiError } from "../utils/apiError";
+import { apiSuccess } from "../utils/apiSuccess";
 import asyncHandler from "../utils/asyncHandler";
 
 const menuCreate = asyncHandler(async (req, res) => {
@@ -20,7 +21,12 @@ const menuCreate = asyncHandler(async (req, res) => {
 
   return res
     .status(created ? 201 : 200)
-    .json(created ? 201 : 200, resutl.value);
+    .json(
+      new apiSuccess(
+        created ? 201 : 200,
+        created ? "new menu created success" : "the same updated success"
+      )
+    );
 });
 
 export { menuCreate };
