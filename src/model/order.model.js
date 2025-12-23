@@ -1,5 +1,20 @@
 import mongoose, { Schema } from "mongoose";
 
+const itemSchema = new Schema({
+  name: {
+    type: String,
+    required: [true, "name is required"],
+  },
+  quantity: {
+    type: Number,
+    required: [true, "quantity is required"],
+  },
+  price: {
+    type: Number,
+    require: [true, "price is required"],
+  },
+});
+
 const orderSchema = new Schema(
   {
     customerDetails: {
@@ -25,7 +40,7 @@ const orderSchema = new Schema(
       totalWithTax: { type: Number, required: true },
     },
     items: {
-      type: Array,
+      type: [itemSchema],
       require: true,
       validate: {
         validator: (v) => Array.isArray(v) && v.length > 0,
