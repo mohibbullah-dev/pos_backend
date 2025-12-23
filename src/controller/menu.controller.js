@@ -1,7 +1,7 @@
-import { Menu } from "../model/menu.model";
-import { apiError } from "../utils/apiError";
-import { apiSuccess } from "../utils/apiSuccess";
-import asyncHandler from "../utils/asyncHandler";
+import { Menu } from "../model/menu.model.js";
+import { apiError } from "../utils/apiError.js";
+import { apiSuccess } from "../utils/apiSuccess.js";
+import asyncHandler from "../utils/asyncHandler.js";
 
 const menuCreate = asyncHandler(async (req, res) => {
   const { name, icon, color, dishes } = req.body;
