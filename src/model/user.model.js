@@ -20,6 +20,9 @@ const userSchema = new Schema(
     email: {
       type: String,
       required: [true, "email is required"],
+      lowercase: true,
+      trim: true,
+      unique: true,
       validate: (v) => {
         return /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(v);
       },

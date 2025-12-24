@@ -10,13 +10,18 @@ const menuCreate = asyncHandler(async (req, res) => {
   const createdBy = req.user.id;
   if (!name || !icon || !color || !createdBy)
     throw new apiError(400, "all fields are required");
-  if (Object.keys(dishes).length <= 0)
+  if (Object.keys(dishes).length <= 0 || !Array.isArray(dishes))
     throw new apiError(400, "dihes are required");
 
   const resutl = await Menu.findOneAndUpdate(
     { name },
     { name, icon, color, createdBy, dishes },
-    { new: true, upsert: true, includeResultMetadata: true }
+    {
+      new: true,
+      upsert: true,
+      includeResultMetadata: true,
+      runValidators: true,
+    }
   );
   if (!resutl.value) throw new apiError(500, "menu creation faild!");
 

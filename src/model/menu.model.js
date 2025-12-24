@@ -4,16 +4,19 @@ const itemSchema = new Schema({
   name: {
     type: String,
     required: [true, "dish is required"],
+    trim: true,
+    unique: true,
   },
   price: {
     type: Number,
-    require: [true, "price is required"],
+    required: [true, "price is required"],
   },
   category: {
     type: String,
     required: [true, "category is required"],
   },
 });
+
 const menuSchema = new Schema(
   {
     name: {
@@ -31,7 +34,7 @@ const menuSchema = new Schema(
       type: [itemSchema],
       required: true,
       validate: {
-        validator: (v) => Array.isArray(v) || v.length > 0,
+        validator: (v) => Array.isArray(v) && v.length > 0,
         message: "at least one item is required",
       },
     },
