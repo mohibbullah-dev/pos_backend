@@ -21,10 +21,10 @@ const storage = multer.diskStorage({
   },
 });
 
-const multerAvaterUpload = multer({
+const singleFileUpload = multer({
   storage: storage,
   limits: 5 * 1024 * 1024,
   filter,
 });
 
-export { multerAvaterUpload };
+export { singleFileUpload };
