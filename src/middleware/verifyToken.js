@@ -7,7 +7,7 @@ const verifyToken = async (req, res, next) => {
   const authHeader = req.headers?.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer "))
-    throw new apiError(400, "accessToken is not found");
+    throw new apiError(401, "accessToken is not found");
 
   const token = authHeader.split(" ")[1];
 
@@ -18,7 +18,7 @@ const verifyToken = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
-    throw new apiError(400, "invalid or exipred accessToken");
+    throw new apiError(401, "invalid or exipred accessToken");
   }
 };
 

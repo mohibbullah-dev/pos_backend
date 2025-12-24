@@ -7,6 +7,7 @@ import { cloudinaryImageUpload } from "../utils/cloudinary.js";
 const createRestaurant = asyncHandler(async (req, res) => {
   const { name, contact, address, openingHours, currency, taxPercent, status } =
     req.body;
+
   const ownerId = req?.user?.id;
   const localPath = req?.file?.path;
 
@@ -23,6 +24,11 @@ const createRestaurant = asyncHandler(async (req, res) => {
   )
     throw new apiError(400, "all fields are required");
 
+  const key = name.replace(/\s+/g, "").toLowerCase();
+
+  const exists = await Restaurant.findOne({ nameKey: key });
+  if (exists) throw new apiError(400, "the Restaurant already exists");
+
   const response = await cloudinaryImageUpload(localPath, {
     folder: "restaurantLogo",
     use_filenames: true,
@@ -37,10 +43,9 @@ const createRestaurant = asyncHandler(async (req, res) => {
 
   if (!response) throw new apiError(500, "cloudinary imageUpload faild!");
 
-  const exists = await Restaurant.findOne({ name });
-  if (exists) throw new apiError(400, "the Restaurant already exists");
   const restaurant = await Restaurant.create({
     name,
+    nameKey: key,
     contact,
     address,
     openingHours,

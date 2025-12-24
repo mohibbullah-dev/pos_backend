@@ -28,7 +28,7 @@ app.use("/api/v1/users", userRoute);
 app.use("/api/v1/orders", orderRoute);
 app.use("/api/v1/tables", tableRoute);
 app.use("/api/v1/menus", menuRouter);
-app.use("/api/v1/restaurant", restaurantRouter);
+app.use("/api/v1/restaurants", restaurantRouter);
 
 app.use(errorHandler);
 export { app };

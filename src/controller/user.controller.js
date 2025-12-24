@@ -166,14 +166,14 @@ const generateNewAccessToken = asyncHandler(async (req, res) => {
   const payload = await jwt.verify(refreToken, REFRESH_TOKNE_SECRET);
 
   if (!payload?.id)
-    throw new apiError(400, "refreshToken dosen't contain valid info");
+    throw new apiError(401, "refreshToken dosen't contain valid info");
 
   const session = await RefreshSession.findOne({
     userId: payload?.id,
     currentStatus: "logedIn",
   });
 
-  if (!session) throw new apiError(400, "session not found");
+  if (!session) throw new apiError(401, "session not found");
 
   const newRefreshToken = await generateRefreshToken(payload?.id);
   const newAccessToken = await generateAccessToken(payload?.id);
@@ -183,7 +183,7 @@ const generateNewAccessToken = asyncHandler(async (req, res) => {
 
   // if (!sessions.length === 0) throw new apiError(400, "no refreshToken");
   const isMatch = await conpareHashToken(refreToken, session?.tokenHash);
-  if (!isMatch) throw new apiError(400, "tokenHashed no match");
+  if (!isMatch) throw new apiError(401, "tokenHashed no match");
   const newHashToken = await hashToken(newRefreshToken);
 
   session.tokenHash = newHashToken;

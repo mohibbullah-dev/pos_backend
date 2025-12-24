@@ -5,8 +5,15 @@ const restaurantSchema = new Schema(
     name: {
       type: String,
       trim: true,
-      unique: true,
       required: [true, "name is required"],
+    },
+    nameKey: {
+      type: String,
+      trim: true,
+      lowercase: true,
+      unique: true,
+      select: false,
+      require: [true, "nameKey is required"],
     },
 
     contact: {
