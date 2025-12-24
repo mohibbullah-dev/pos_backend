@@ -4,15 +4,18 @@ import { apiSuccess } from "../utils/apiSuccess.js";
 import asyncHandler from "../utils/asyncHandler.js";
 
 const menuCreate = asyncHandler(async (req, res) => {
+  console.log("it's came controller");
+
   const { name, icon, color, dishes } = req.body;
-  if (!name || !icon || !color)
+  const createdBy = req.user.id;
+  if (!name || !icon || !color || !createdBy)
     throw new apiError(400, "all fields are required");
   if (Object.keys(dishes).length <= 0)
     throw new apiError(400, "dihes are required");
 
   const resutl = await Menu.findOneAndUpdate(
     { name },
-    { name, icon, color, dishes },
+    { name, icon, color, createdBy, dishes },
     { new: true, upsert: true, includeResultMetadata: true }
   );
   if (!resutl.value) throw new apiError(500, "menu creation faild!");
@@ -24,7 +27,7 @@ const menuCreate = asyncHandler(async (req, res) => {
     .json(
       new apiSuccess(
         created ? 201 : 200,
-        created ? "new menu created success" : "the same updated success"
+        created ? "new menu created success" : "the same menu updated success"
       )
     );
 });
