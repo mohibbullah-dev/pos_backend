@@ -30,6 +30,12 @@ const userSchema = new Schema(
       trim: true,
       unique: true,
     },
+    restaurantId: {
+      type: Schema.Types.ObjectId,
+      ref: "Restaurant",
+      default: null,
+      index: true,
+    },
     avatar: {
       url: {
         type: String,

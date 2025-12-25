@@ -12,7 +12,6 @@ import {
   conpareHashToken,
 } from "../utils/token.js";
 import crypto from "crypto";
-import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { REFRESH_TOKNE_SECRET } from "../constant.js";
 
