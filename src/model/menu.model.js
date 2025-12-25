@@ -23,6 +23,13 @@ const menuSchema = new Schema(
       type: String,
       required: [true, "name is required"],
     },
+    namekey: {
+      type: String,
+      required: [true, "keyname is required"],
+      trim: true,
+      lowercase: true,
+      select: false,
+    },
     icon: { type: String },
     color: { type: String },
     createdBy: {

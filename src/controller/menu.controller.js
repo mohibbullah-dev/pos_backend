@@ -4,17 +4,17 @@ import { apiSuccess } from "../utils/apiSuccess.js";
 import asyncHandler from "../utils/asyncHandler.js";
 
 const menuCreate = asyncHandler(async (req, res) => {
-  console.log("it's came controller");
-
   const { name, icon, color, dishes } = req.body;
-  const createdBy = req.user.id;
-  if (!name || !icon || !color || !createdBy)
+  const restaurantId = req?.restaurantId;
+  const createdBy = req?.user?.id;
+  if (!name || !icon || !color || !createdBy || !restaurantId)
     throw new apiError(400, "all fields are required");
   if (Object.keys(dishes).length <= 0 || !Array.isArray(dishes))
-    throw new apiError(400, "dihes are required");
+    throw new apiError(400, "dishe are required");
 
+  const key = name.replace(/\s+/g, "").toLowerCase();
   const resutl = await Menu.findOneAndUpdate(
-    { name },
+    { namekey: key, restaurantId },
     { name, icon, color, createdBy, dishes },
     {
       new: true,
