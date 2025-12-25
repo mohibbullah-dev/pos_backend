@@ -38,6 +38,12 @@ const menuSchema = new Schema(
         message: "at least one item is required",
       },
     },
+    restaurantId: {
+      type: Schema.Types.ObjectId,
+      ref: "Restaurant",
+      default: null,
+      index: true,
+    },
   },
   { timestamps: true }
 );
