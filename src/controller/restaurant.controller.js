@@ -10,8 +10,7 @@ const createRestaurant = asyncHandler(async (req, res) => {
     req.body;
 
   const ownerId = req?.user?.id;
-  const restaurantCout = req?.user?.restaurantCout;
-  const restaurantId = req?.restaurant;
+  const restaurantId = req?.restaurantId;
   console.log("restaurantId :", restaurantId);
   const localPath = req?.file?.path;
 

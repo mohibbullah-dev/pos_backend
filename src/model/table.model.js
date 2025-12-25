@@ -18,6 +18,11 @@ const tableSchema = new Schema(
       default: null,
       index: true,
     },
+    createdBy: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
 
     seatNo: {
       type: Number,

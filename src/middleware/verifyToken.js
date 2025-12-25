@@ -16,7 +16,7 @@ const verifyToken = async (req, res, next) => {
     const user = await User.findById(decodedToken?.id);
     if (!user) throw new apiError(404, "user not found");
     req.user = user;
-    req.restaurant = user?.restaurantId;
+    req.restaurantId = user?.restaurantId;
     next();
   } catch (error) {
     throw new apiError(401, "invalid or exipred accessToken");
