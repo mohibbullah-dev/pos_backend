@@ -1,4 +1,5 @@
 import { Restaurant } from "../model/restaurant.model.js";
+import { User } from "../model/user.model.js";
 import { apiError } from "../utils/apiError.js";
 import { apiSuccess } from "../utils/apiSuccess.js";
 import asyncHandler from "../utils/asyncHandler.js";
@@ -9,6 +10,9 @@ const createRestaurant = asyncHandler(async (req, res) => {
     req.body;
 
   const ownerId = req?.user?.id;
+  const restaurantCout = req?.user?.restaurantCout;
+  const restaurantId = req?.restaurant;
+  console.log("restaurantId :", restaurantId);
   const localPath = req?.file?.path;
 
   if (
@@ -29,39 +33,54 @@ const createRestaurant = asyncHandler(async (req, res) => {
   const exists = await Restaurant.findOne({ nameKey: key });
   if (exists) throw new apiError(400, "the Restaurant already exists");
 
-  const response = await cloudinaryImageUpload(localPath, {
-    folder: "restaurantLogo",
-    use_filenames: true,
-    overwrite: true,
-    resource_type: "image",
-    transformation: [
-      { width: 300, height: 300, crop: "fill", gravity: "face" },
-      { radius: "max" },
-    ],
-    public_id: Date.now(),
-  });
+  const RestOwner = await User.findById(ownerId);
 
-  if (!response) throw new apiError(500, "cloudinary imageUpload faild!");
+  if (RestOwner.restaurantCout === 0) {
+    const response = await cloudinaryImageUpload(localPath, {
+      folder: "restaurantLogo",
+      use_filenames: true,
+      overwrite: true,
+      resource_type: "image",
+      transformation: [
+        { width: 300, height: 300, crop: "fill", gravity: "face" },
+        { radius: "max" },
+      ],
+      public_id: Date.now(),
+    });
 
-  const restaurant = await Restaurant.create({
-    name,
-    nameKey: key,
-    contact,
-    address,
-    openingHours,
-    currency,
-    taxPercent,
-    status,
-    ownerId,
-    restaurantLogo: {
-      url: response?.url,
-      public_id: response?.public_id,
-    },
-  });
+    if (!response) throw new apiError(500, "cloudinary imageUpload faild!");
 
-  return res
-    .status(201)
-    .json(new apiSuccess(201, "Restaurant created success", restaurant));
+    //  restaurant create
+
+    const restaurant = await Restaurant.create({
+      name,
+      nameKey: key,
+      contact,
+      address,
+      openingHours,
+      currency,
+      taxPercent,
+      status,
+      ownerId,
+      restaurantLogo: {
+        url: response?.url,
+        public_id: response?.public_id,
+      },
+    });
+
+    RestOwner.restaurantId = restaurant?._id;
+    RestOwner.restaurantCout = 1;
+    await RestOwner.save({ validateBeforeSave: false });
+
+    return res
+      .status(201)
+      .json(new apiSuccess(201, "Restaurant created success", restaurant));
+  } else {
+    throw new apiError(
+      400,
+      "free-user can not create Restaurant more than one"
+    );
+  }
 });
 
 export { createRestaurant };

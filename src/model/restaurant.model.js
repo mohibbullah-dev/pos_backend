@@ -11,7 +11,7 @@ const restaurantSchema = new Schema(
       type: String,
       trim: true,
       lowercase: true,
-      unique: true,
+      // unique: true,
       select: false,
       require: [true, "nameKey is required"],
     },
@@ -20,7 +20,6 @@ const restaurantSchema = new Schema(
       email: {
         type: String,
         required: [true, "email is required"],
-        unique: true,
         trim: true,
         lowercase: true,
         validate: {

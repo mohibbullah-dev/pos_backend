@@ -36,6 +36,10 @@ const userSchema = new Schema(
       default: null,
       index: true,
     },
+    restaurantCout: {
+      type: Number,
+      default: 0,
+    },
     avatar: {
       url: {
         type: String,
