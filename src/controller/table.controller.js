@@ -6,7 +6,9 @@ import asyncHandler from "../utils/asyncHandler.js";
 
 const addTables = asyncHandler(async (req, res) => {
   const { tableNo, seatNo } = req.body;
-  if (!tableNo || !seatNo)
+  const userId = req?.user?.id;
+  const restaurantId = req?.restaurantId;
+  if (!tableNo || !seatNo || !userId || !restaurantId)
     throw new apiError(400, "tableNo & seatNo are required");
   const exist = await Table.findOne({ tableNo });
   if (exist) throw new apiError(400, "table aready exists");
@@ -14,6 +16,8 @@ const addTables = asyncHandler(async (req, res) => {
   const table = await Table.create({
     tableNo,
     seatNo,
+    createdBy: userId,
+    restaurantId,
   });
 
   return res
@@ -22,7 +26,8 @@ const addTables = asyncHandler(async (req, res) => {
 });
 
 const getTables = asyncHandler(async (req, res) => {
-  const tables = await Table.find();
+  const restaurantId = req?.user?.restaurantId;
+  const tables = await Table.find({ restaurantId });
   if (tables.length === 0) throw new apiSuccess(200, "no tables yet");
   return res
     .status(200)
@@ -32,13 +37,14 @@ const getTables = asyncHandler(async (req, res) => {
 const updateTable = asyncHandler(async (req, res) => {
   const { tableStatus, currentOrder } = req.body;
   const tableId = req.params?.id;
-  if (!tableStatus || !currentOrder)
+  const restaurantId = req?.user?.restaurantId;
+  if (!tableStatus || !currentOrder || !restaurantId)
     throw new apiError(400, "all file are required", updateTable);
   if (!mongoose.Types.ObjectId.isValid(tableId))
     throw new apiError(400, "it's not a valide ObjectId");
 
-  const table = await Table.findByIdAndUpdate(
-    tableId,
+  const table = await Table.findOneAndUpdate(
+    { _id: tableId, restaurantId },
     { tableStatus, currentOrder },
     { new: true }
   );
