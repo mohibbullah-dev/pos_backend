@@ -47,6 +47,12 @@ const orderSchema = new Schema(
         message: "at least one item is required",
       },
     },
+    restaurantId: {
+      type: Schema.Types.ObjectId,
+      ref: "Restaurant",
+      default: null,
+      index: true,
+    },
     table: {
       type: Schema.Types.ObjectId,
       ref: "Table",
