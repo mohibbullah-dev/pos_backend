@@ -39,6 +39,16 @@ const orderSchema = new Schema(
       tax: { type: Number, required: true },
       totalWithTax: { type: Number, required: true },
     },
+    paidTotal: {
+      type: Number,
+      default: 0,
+    },
+    paymentStatus: {
+      type: String,
+      enum: ["PENDING", "PAID"],
+      default: "PENDING",
+      index: true,
+    },
     items: {
       type: [itemSchema],
       require: true,
