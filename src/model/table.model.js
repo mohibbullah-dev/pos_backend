@@ -4,8 +4,7 @@ const tableSchema = new Schema(
   {
     tableNo: {
       type: Number,
-      required: true,
-      unique: true,
+      required: [true, "Table-No is required"],
     },
     tableStatus: {
       type: String,
@@ -15,7 +14,7 @@ const tableSchema = new Schema(
     restaurantId: {
       type: Schema.Types.ObjectId,
       ref: "Restaurant",
-      default: null,
+      required: true,
       index: true,
     },
     createdBy: {

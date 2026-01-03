@@ -81,6 +81,17 @@ const createChekOut = asyncHandler(async (req, res) => {
 });
 
 //   getPaymentPublic start here
-const getPaymentPublic = asyncHandler(async (req, res) => {});
+const getPaymentPublic = asyncHandler(async (req, res) => {
+  const { paymentId } = req?.params;
+  const payment = await Payment.findById(paymentId).lean();
+  if (!payment) throw new apiError(404, "payment is not found");
+  return res.json({
+    _id: payment?._id,
+    amount: payment?.amount,
+    currency: payment?.currency,
+    status: payment?.status,
+    clientSecret: payment?.clientSecret,
+  });
+});
 
 export { createChekOut, getPaymentPublic };

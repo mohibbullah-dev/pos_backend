@@ -10,8 +10,8 @@ const addTables = asyncHandler(async (req, res) => {
   const restaurantId = req?.restaurantId;
   if (!tableNo || !seatNo || !userId || !restaurantId)
     throw new apiError(400, "tableNo & seatNo are required");
-  const exist = await Table.findOne({ tableNo });
-  if (exist) throw new apiError(400, "table aready exists");
+  const exist = await Table.findOne({ restaurantId, tableNo });
+  if (exist) throw new apiError(400, "table already exists");
 
   const table = await Table.create({
     tableNo,

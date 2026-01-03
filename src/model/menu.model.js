@@ -5,7 +5,6 @@ const itemSchema = new Schema({
     type: String,
     required: [true, "dish is required"],
     trim: true,
-    unique: true,
   },
   price: {
     type: Number,
@@ -48,11 +47,12 @@ const menuSchema = new Schema(
     restaurantId: {
       type: Schema.Types.ObjectId,
       ref: "Restaurant",
-      default: null,
-      index: true,
+      required: [true, ["restaurant is required"]],
     },
   },
   { timestamps: true }
 );
+
+menuSchema.index({ restaurantId: 1, namekey: 1 }, { unique: true });
 
 export const Menu = mongoose.model("Menu", menuSchema);

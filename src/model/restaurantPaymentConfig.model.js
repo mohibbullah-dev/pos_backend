@@ -16,10 +16,12 @@ const schema = new Schema(
     stripeSecretKey: {
       type: String,
       required: true,
+      select: false,
     },
-    webhookStrimeSecretKey: {
+    webhookStripeSecretKey: {
       type: String,
       required: true,
+      select: false,
     },
     defaultCurrency: {
       type: String,

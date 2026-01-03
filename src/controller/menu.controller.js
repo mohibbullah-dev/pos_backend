@@ -9,13 +9,12 @@ const menuCreate = asyncHandler(async (req, res) => {
   const createdBy = req?.user?.id;
   if (!name || !icon || !color || !createdBy || !restaurantId)
     throw new apiError(400, "all fields are required");
-  if (Object.keys(dishes).length <= 0 || !Array.isArray(dishes))
+  if (Object.keys(dishes).length <= 0)
     throw new apiError(400, "dishe are required");
-
   const key = name.replace(/\s+/g, "").toLowerCase();
   const resutl = await Menu.findOneAndUpdate(
-    { namekey: key, restaurantId },
-    { name, icon, color, createdBy, dishes },
+    { namekey: key },
+    { name, icon, color, createdBy, dishes, restaurantId },
     {
       new: true,
       upsert: true,
@@ -32,7 +31,8 @@ const menuCreate = asyncHandler(async (req, res) => {
     .json(
       new apiSuccess(
         created ? 201 : 200,
-        created ? "new menu created success" : "the same menu updated success"
+        created ? "new menu created success" : "the same menu updated success",
+        resutl
       )
     );
 });
